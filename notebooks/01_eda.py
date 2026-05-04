@@ -33,10 +33,8 @@ delivered["delay_days"] = (
 
 delivered["is_late"] = delivered["delay_days"] > 0
 
-# Time features (on full df)
+# Time feature (on full df)
 df["order_month"] = df["order_purchase_timestamp"].dt.to_period("M")
-df["order_now"] = df["order_purchase_timestamp"].dt.day_name()
-df["order_hour"] = df["order_purchase_timestamp"].dt.hour
 
 # %%
 # Missing value % per column
@@ -61,10 +59,11 @@ fig_pie.show()
 # %%
 monthly = df.groupby("order_month")["order_id"].nunique().reset_index()
 monthly.columns = ["month", "orders"]
+monthly["month"] = monthly["month"].astype(str) # Plotly cannot JSON-serialize Period in Jupyter (Marimo handled it implicitly)
 
 fig_line = px.line(
     monthly, x="month", y="orders",
-    title="Monthly Orders Over Volume"
+    title="Monthly Order Volume"
 )
-fig.update_xaxes(tickangle=45)
+fig_line.update_xaxes(tickangle=45)
 fig_line.show()
