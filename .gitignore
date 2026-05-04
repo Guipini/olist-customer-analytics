@@ -27,9 +27,8 @@ venv/
 env/
 .env
 
-# Serena project memories (local context)
+# Local IDE/agent context (not portable across machines)
 .serena/
-
 CLAUDE.md
 
 # OS
