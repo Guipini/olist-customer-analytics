@@ -1,0 +1,46 @@
+# Data files (download from Kaggle: https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce)
+data/*.csv
+data/*.parquet
+data/_pre_migration_backup/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+*-checkpoint.ipynb
+
+# Marimo (kept temporarily during migration)
+__marimo__/
+
+# Virtual environments
+.venv/
+venv/
+env/
+.env
+
+# Serena project memories (local context)
+.serena/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Notebook outputs (belt-and-suspenders alongside nbstripout)
+# Comment out if you ever want to commit a snapshot with rendered outputs:
+# notebooks/*.ipynb
