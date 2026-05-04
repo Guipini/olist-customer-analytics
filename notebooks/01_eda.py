@@ -81,7 +81,7 @@ fig_line.show()
 
 # %%
 # Repeat-purchase distribution. Use customer_unique_id (not customer_id);
-# nunique collapses muti-item orders into 1 per order
+# nunique collapses multi-item orders into 1 per order
 orders_per_customer = df.groupby("customer_unique_id")["order_id"].nunique()
 n_customers = len(orders_per_customer)
 
@@ -90,7 +90,7 @@ freq_binned = (
     .value_counts()
     .reindex(["1", "2", "3", "4+"], fill_value=0)
 )
-freq_pct = (freq_binned / n_customers * 100). round(1)
+freq_pct = (freq_binned / n_customers * 100).round(1)
 
 print(f"One-time buyers: {freq_pct['1']}% ({freq_binned['1']:,} of {n_customers:,})")
 
@@ -103,3 +103,40 @@ fig_repeat_purchase = px.bar(
 )
 fig_repeat_purchase.update_traces(textposition="outside")
 fig_repeat_purchase.show()
+
+# %% [markdown]
+# ### Review score distribution
+#
+# **Insight**: The review distribution is bimodal. 5-star is the primary mode (57.8%), but 1-star is the secondary mode at 11.5%, higher than both 2-star (3.2%) and 3-star (8.2%). Customers polarize into delighted and disappointed camps with a thin middle. The 99,224 reviews break down as 5-star: 57,328 / 4-star: 19,142 / 3-star: 8,179 / 2-star: 3,151 / 1-star: 11,424.
+#
+# **Method**: Bar chart of all five ordinal score levels with percentages on the y-axis and absolute counts as text labels. Used `df_reviews` directly (one row per review) rather than the order_items-level `df` to avoid inflating the count for multi-item orders. Reported mode (5-star) and IQR (Q1=4, Q3=5) instead of mean and standard deviation, since review scores are ordinal and the bimodal shape makes any average misleading.
+#
+# **Trade-off**: Mode + IQR captures the positive skew (75% of reviews are 4 or 5 stars) but undersells the weight on the negative tail. The 1-star secondary peak (11.5%, more than 11,000 reviews) is the actionable signal, not the 5-star pile-up. Always report the bimodal shape alongside the central tendency, not instead of it.
+#
+# **Gotcha**: A naive reading of "57.8% gave 5 stars" reads as uniformly high satisfaction. The actual story is more polarized: roughly 1 in 9 customers gives the lowest possible score. The README copy should frame the experience as polarized rather than uniformly positive. Phase 2's delivery analysis and Phase 8's NLP topic modeling will explain why the 1-star peak exists.
+
+# %%
+# Review score distribution. Scores are ordinal (1-5), so plot as bar
+# (not histogram). Use df_reviews directly: one row per review.
+score_counts = (
+    df_reviews["review_score"].dropna().astype(int)
+    .value_counts()
+    .reindex([1, 2, 3, 4, 5], fill_value=0)
+)
+n_reviews = score_counts.sum()
+score_pct = (score_counts / n_reviews * 100).round(1)
+
+print(f"Mode: {score_counts.idxmax()}-star ({score_pct[score_counts.idxmax()]}%)")
+q1= score_counts.cumsum().searchsorted(n_reviews * 0.25)+1
+q3 = score_counts.cumsum().searchsorted(n_reviews * 0.75)+1
+print(f"IQR: Q1={q1}, Q3={q3}")
+
+fig_review_dist = px.bar(
+    x=score_counts.index.astype(str),
+    y=score_pct.values,
+    text=[f"{c:,}" for c in score_counts.values],
+    labels={"x": "Review Score", "y": "Percentage of Reviews"},
+    title="Review Score Distribution"
+)
+fig_review_dist.update_traces(textposition="outside")
+fig_review_dist.show()
