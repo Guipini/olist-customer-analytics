@@ -1,0 +1,21 @@
+# Olist E-Commerce Customer Analytics
+# Python 3.12+ required (tested on 3.12)
+
+# Core data + SQL
+duckdb==1.5.0
+pandas==2.3.3
+
+# Visualization
+plotly==5.18.0
+kaleido==1.2.0          # Plotly static image export (PNG/SVG) for README assets
+
+# Notebook environment
+jupyter==1.0.0
+jupyterlab==4.4.9
+nbconvert==7.16.6        # Notebook to HTML/PDF/script export
+nbformat==5.10.4         # Programmatic .ipynb manipulation
+jupytext==1.19.1         # Paired .ipynb + .py:percent for git-friendly diffs
+nbstripout==0.9.1        # Strip cell outputs on commit
+
+# Migration safety net (kept for ~1 month, prune after Jupyter migration is verified stable)
+marimo==0.21.1

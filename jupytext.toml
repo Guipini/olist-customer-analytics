@@ -1,0 +1,11 @@
+# Pair every .ipynb in notebooks/ with a .py:percent twin.
+# Editing either side syncs the other on save (in JupyterLab/VS Code with jupytext extension,
+# or via `jupytext --sync notebooks/*.ipynb` from the CLI).
+#
+# Why: .ipynb is a JSON blob with embedded outputs and metadata, so git diffs are unreadable.
+# The .py:percent twin is plain Python with `# %%` cell separators, perfect for diffs and code review.
+# Reviewers on GitHub see the rendered .ipynb; you get clean diffs from the .py twin.
+
+formats = "ipynb,py:percent"
+notebook_metadata_filter = "-all"
+cell_metadata_filter = "-all"

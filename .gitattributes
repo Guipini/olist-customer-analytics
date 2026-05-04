@@ -1,0 +1,23 @@
+# Pin line endings to LF for all text files.
+# Prevents Windows CRLF/LF churn on jupytext .py twin sync (jupytext flips line endings on save otherwise).
+
+* text=auto eol=lf
+
+# Explicit overrides for files most affected
+*.py    text eol=lf
+*.ipynb text eol=lf
+*.md    text eol=lf
+*.toml  text eol=lf
+*.txt   text eol=lf
+*.csv   text eol=lf
+
+# Binary - never modify
+*.parquet binary
+*.png     binary
+*.jpg     binary
+*.pdf     binary
+
+# nbstripout: strip cell outputs from .ipynb on git add (so commits don't bloat with outputs)
+# Requires: pip install nbstripout && nbstripout --install (run once after cloning)
+*.ipynb filter=nbstripout
+*.ipynb diff=ipynb
