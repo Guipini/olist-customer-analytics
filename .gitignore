@@ -30,6 +30,8 @@ env/
 # Serena project memories (local context)
 .serena/
 
+CLAUDE.md
+
 # OS
 .DS_Store
 Thumbs.db
