@@ -59,7 +59,7 @@ fig_pie.show()
 # %%
 monthly = df.groupby("order_month")["order_id"].nunique().reset_index()
 monthly.columns = ["month", "orders"]
-monthly["month"] = monthly["month"].astype(str) # Plotly cannot JSON-serialize Period in Jupyter (Marimo handled it implicitly)
+monthly["month"] = monthly["month"].astype(str) # Plotly cannot JSON-serialize Period objects, cast to string before plotting
 
 fig_monthly_volume = px.line(
     monthly, x="month", y="orders",
