@@ -140,3 +140,39 @@ fig_review_dist = px.bar(
 )
 fig_review_dist.update_traces(textposition="outside")
 fig_review_dist.show()
+
+# %% [markdown]
+# ### Delivery time distribution
+#
+# **Insight**: Olist over-promises delivery time aggressively as a customer-experience strategy. The median order arrives 12 days before its estimated delivery date, and only 6.8% of delivered orders are actually late (6,534 of 96,470). The marketplace runs on under-promise, over-deliver: estimates carry roughly two weeks of safety buffer, which sets up a positive surprise for most customers.
+#
+# **Method**: Histogram of `delay_days = order_delivered_customer_date - order_estimated_delivery_date`, computed on the delivered-orders subset and de-duplicated to one row per order (the master DataFrame is at the order_items level, so multi-item orders would otherwise be over-counted). Negative values mean early, positive mean late. A vertical line at zero separates the early/on-time region from the late region. Reported median (not mean) and percentage late, since the long right tail of extreme delays would skew a mean.
+#
+# **Trade-off**: Aggregating to a single nationwide distribution loses the per-state and per-seller structure. Northern Brazilian states (Amazonas, Pará, Roraima) likely have substantially longer transit times than the southeastern hubs (São Paulo, Rio de Janeiro), and individual seller reliability varies widely. Phase 2's deeper delivery analysis will decompose those dimensions; Phase 1 gives only the marketplace-wide overview.
+#
+# **Gotcha**: A 6.8% late rate sounds excellent in isolation, but the bimodal review distribution from the previous chart shows 11.5% of customers leave 1-star reviews. Late delivery alone cannot account for the full negative tail. The remaining dissatisfaction must come from other sources: product mismatch, packaging damage, seller communication, or post-purchase support. Phase 8's NLP analysis on the Portuguese review text will eventually decompose what those 1-star reviews actually complain about.
+
+# %%
+# Delivery delay distribution. delay_days = actual - estimated.
+# Negative means early, positive means late. Vertical line at 0
+# separates on-time/early from late. Use the `delivered` DataFrame
+# (already filtered to delivered orders in cell 1).
+delay = delivered.drop_duplicates("order_id")["delay_days"].dropna()
+
+n_total = len(delay)
+n_late = int((delay > 0).sum())
+median_delay = float(delay.median())
+pct_late = round(n_late / n_total * 100, 1)
+
+print(f"Total delivered orders: {n_total:,}")
+print(f"Median delay: {median_delay:.1f} days (negative = early)")
+print(f"Late orders: {n_late:,} ({pct_late}%)")
+
+fig_delivery_delay = px.histogram(
+    delay,
+    nbins=80,
+    labels={"value": "Delivery Delay (days)", "count": "Number of Orders"},
+    title="Delivery delay (days late vs Olist's estimated delivery)"
+) 
+fig_delivery_delay.add_vline(x=0, line_dash="dash", line_color="red", annotation_text="On-time/late boundary")
+fig_delivery_delay.show()
