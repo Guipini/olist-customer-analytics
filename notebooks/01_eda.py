@@ -61,12 +61,12 @@ monthly = df.groupby("order_month")["order_id"].nunique().reset_index()
 monthly.columns = ["month", "orders"]
 monthly["month"] = monthly["month"].astype(str) # Plotly cannot JSON-serialize Period in Jupyter (Marimo handled it implicitly)
 
-fig_line = px.line(
+fig_monthly_volume = px.line(
     monthly, x="month", y="orders",
     title="Monthly Order Volume"
 )
-fig_line.update_xaxes(tickangle=45)
-fig_line.show()
+fig_monthly_volume.update_xaxes(tickangle=45)
+fig_monthly_volume.show()
 
 # %% [markdown]
 # ### Repeat-purchase rate
@@ -213,3 +213,18 @@ fig_corr = px.imshow(
     title="Spearman correlation: price, freight, review_score, delivery times"
 )
 fig_corr.show()
+
+# %%
+# Export hero charts as PNG for the README. Run this cell at the end
+# of the notebook so all three figures exist in the scope.
+from pathlib import Path
+ASSETS = PROJECT_ROOT / "assets" / "readme"
+ASSETS.mkdir(parents=True, exist_ok=True)
+
+fig_monthly_volume.write_image(ASSETS / "phase1_monthly_volume.png", scale=2)
+fig_repeat_purchase.write_image(ASSETS / "phase1_repeat_purchase.png", scale=2)
+fig_review_dist.write_image(ASSETS / "phase1_review_distribution.png", scale=2)
+
+print(f"Exported 3 PNGs to {ASSETS.relative_to(PROJECT_ROOT)}")
+for png in sorted(ASSETS.glob("phase1_*.png")):
+    print(f"  {png.name}: {png.stat().st_size:,} bytes")
