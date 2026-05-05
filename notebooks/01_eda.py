@@ -3,6 +3,8 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from pathlib import Path
+import plotly.io as pio
+pio.renderers.default = "notebook+png"
 
 PROJECT_ROOT = Path.cwd() if (Path.cwd() / "data").exists() else Path.cwd().parent
 assert (PROJECT_ROOT / "data").exists(), f"data/ not found from {Path.cwd()}"
