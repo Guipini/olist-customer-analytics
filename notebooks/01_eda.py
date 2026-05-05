@@ -176,3 +176,40 @@ fig_delivery_delay = px.histogram(
 ) 
 fig_delivery_delay.add_vline(x=0, line_dash="dash", line_color="red", annotation_text="On-time/late boundary")
 fig_delivery_delay.show()
+
+# %% [markdown]
+# ### Correlation heatmap: 5 numeric variables at order level
+#
+# **Insight**: Delivery time correlates negatively with review scores, but only modestly (Spearman ρ = -0.23 between `delivered_days` and `review_score`). Counterintuitively, *lateness vs estimate* is an even weaker review predictor (ρ = -0.18 with `delay_days`). Customers seem to care more about absolute waiting time than about whether Olist hit its delivery promise. The heavy SLA padding may defang the "you were late!" emotional response. Most review variance is driven by something other than delivery: 11.5% of reviews are 1-star (Step 4.2), but only 6.8% of orders are late (Step 4.3) and the correlation is too weak to bridge that gap.
+#
+# **Method**: Spearman rank correlation across 95,824 orders, computed at the order level. Item-level columns (`price`, `freight_value`) summed per order before merging with order-level columns (`delivered_days`, `delay_days`, `review_score`). Spearman over Pearson because review_score is ordinal and the price/freight distributions have long right tails that would distort linear correlation. Five variables produce 10 unique pairs; the diagonal and lower triangle are mirrored.
+#
+# **Trade-off**: Spearman captures monotonic relationships but smooths over threshold effects. A sharp drop in satisfaction for orders more than two weeks late, for example, would show up as a modest correlation rather than a step function. Phase 2's delivery analysis will use delay binning plus Kruskal-Wallis testing to surface non-linear structure. The single-cell aggregation also hides state-level and seller-level variation: orders to remote northern states almost certainly show different correlation profiles than São Paulo metro deliveries.
+#
+# **Gotcha**: The 0.47 between `price` and `freight_value` is mechanical and must not be reported as a finding. Freight is a direct function of product weight, and weight scales with price across many categories, so the correlation is the freight pricing model showing up exactly as it should. Similarly, `freight_value` × `delivered_days` (0.38) is logistically expected: heavier items take longer transit, often routed through different carrier tiers. The actually interesting numbers are the modest negative review correlations and the surprising weakness of `delay_days` versus `delivered_days` as a review predictor.
+
+# %%
+# Correlation heatmap: 5 variables at order level. Spearman (not Pearson)
+# because review_score is ordinal and price/freight have long right tails.
+order_totals =  df.groupby("order_id")[["price", "freight_value"]].sum().reset_index()
+order_corr = (
+    delivered.drop_duplicates("order_id")
+    [["order_id", "delivered_days", "delay_days", "review_score"]]
+    .merge(order_totals, on="order_id")
+    .drop("order_id", axis=1)
+    .dropna()
+)
+
+corr_matrix = order_corr.corr(method="spearman").round(2)
+print(f"Pairs computed on {len(order_corr):,} orders")
+print(corr_matrix)
+
+fig_corr = px.imshow(
+    corr_matrix,
+    text_auto=True,
+    color_continuous_scale="RdBu_r",
+    zmin=-1, zmax=1,
+    aspect="auto",
+    title="Spearman correlation: price, freight, review_score, delivery times"
+)
+fig_corr.show()
