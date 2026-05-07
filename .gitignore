@@ -30,6 +30,8 @@ env/
 # Local IDE/agent context (not portable across machines)
 .serena/
 CLAUDE.md
+claudedocs/
+_strip_html_from_charts.py
 
 # OS
 .DS_Store
