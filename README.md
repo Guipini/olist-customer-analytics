@@ -30,7 +30,15 @@ Phase 1 was about pinning down the marketplace's shape before any deeper modelin
 
 Delivery delay distribution and the correlation heatmap are in the [Phase 1 notebook](notebooks/01_eda.ipynb) (linked rather than embedded to keep the README focused on hero charts).
 
-<!-- Phase 2: Delivery Performance Analysis (in progress) -->
+### Phase 2: Delivery Performance Analysis
+
+Phase 2 quantified the delivery-vs-review story Phase 1 only hinted at. Late orders are 5.78x more likely to receive 1-2 stars (52.8% vs 9.1% one-star rate), and the bucketed Kruskal-Wallis test confirms the pattern is real and ordered (epsilon-squared = 0.106, all 6 pairwise comparisons significant after Bonferroni). But lateness explains only 33.8% of all 1-2 star reviews; the remaining two-thirds come from on-time orders where product quality, communication, or other non-delivery factors must be doing the work. Geographic spread is wide: SP delivers in 7.2 days (94.1% on-time) while AM takes 25.9 days but still hits 95.9% on-time because Olist sets very long Amazon estimates; AL is the genuine outlier, slow AND missing estimates (22.3 days, 76.1% on-time). Phase 8 will read the Portuguese review text to find what drives the on-time tail.
+
+#### Charts
+
+![Review score by delivery delay bucket: lateness shifts the distribution but doesn't fully explain the 1-star tail](assets/readme/phase2_delay_review_boxplot.png)
+
+State-level delivery comparison and the 4-panel lifecycle subplot are in the [Phase 2 notebook](notebooks/02_delivery.ipynb).
 <!-- Phase 3: Product & Category Analysis (in progress) -->
 <!-- Phase 4: Seller Performance Scoring (in progress) -->
 <!-- Phase 5: Customer Segmentation - RFM (in progress) -->

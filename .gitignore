@@ -31,7 +31,7 @@ env/
 .serena/
 CLAUDE.md
 claudedocs/
-_strip_html_from_charts.py
+/_*.py
 
 # OS
 .DS_Store
